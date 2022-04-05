@@ -1,10 +1,43 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link rel="stylesheet" href="button.css" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@1,300&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="css/bootstrap.min.css" />
+		<link rel="stylesheet" href="css/bootstrap.rtl.min.css" />
+		<link rel="stylesheet" href="css/popup.css" />
 	</head>
 	<body>
-		<button id="change-ua"></button>
-		<script src="popup.js"></script>
+		<div class="container">
+			<header class="d-flex justify-content-center align-items-center">
+				<img
+					src="images/fingerprint-48.png"
+					style="margin-right: 10px"
+				/>
+				<span style="font-size: 20px; font-weight: bold"
+					>Fingerprint Spoofer</span
+				>
+			</header>
+			<div class="text-center" style="padding-top: 35px">
+				<button
+					id="change-ua"
+					class="btn btn-sm"
+					type="button"
+				></button>
+			</div>
+		</div>
+		<div
+			id="spinner"
+			class="d-flex justify-content-center align-items-center d-none"
+		>
+			<div id="overlay"></div>
+			<div class="spinner-border text-danger position-absolute"></div>
+		</div>
+		<script src="js/bootstrap.bundle.min.js"></script>
+		<script src="js/popup.js"></script>
 	</body>
 </html>
