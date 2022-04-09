@@ -1,34 +1,59 @@
 window.onload = (event) => {
-	const actionBtn = document.querySelector("#change-ua");
+	const changeUABtn = document.querySelector("#changeUA");
+	const blockImageBtn = document.querySelector("#blockImg");
+	const blockJSBtn = document.querySelector("#blockJS");
+
 	const spinner = document.querySelector("#spinner");
 
 	chrome.storage.sync.get("UA_CHANGED", ({ UA_CHANGED }) => {
 		if (UA_CHANGED) {
-			actionBtn.textContent = "Unspoof User Agent";
-			actionBtn.classList.add("btn-danger");
-			actionBtn.classList.remove("btn-primary");
+			changeUABtn.textContent = "User Agent Spoofed";
+			changeUABtn.classList.add("btn-danger");
+			changeUABtn.classList.remove("btn-primary");
 		} else {
-			actionBtn.textContent = "Spoof User Agent";
-			actionBtn.classList.add("btn-primary");
-			actionBtn.classList.remove("btn-danger");
+			changeUABtn.textContent = "Spoof User Agent";
+			changeUABtn.classList.add("btn-primary");
+			changeUABtn.classList.remove("btn-danger");
 		}
 	});
 
-	actionBtn.addEventListener("click", (event) => {
+	chrome.storage.sync.get("IMG_BLOCKED", ({ IMG_BLOCKED }) => {
+		if (IMG_BLOCKED) {
+			blockImageBtn.textContent = "Images Blocked";
+			blockImageBtn.classList.add("btn-danger");
+			blockImageBtn.classList.remove("btn-primary");
+		} else {
+			blockImageBtn.textContent = "Block Images";
+			blockImageBtn.classList.add("btn-primary");
+			blockImageBtn.classList.remove("btn-danger");
+		}
+	});
+
+	chrome.storage.sync.get("JS_BLOCKED", ({ JS_BLOCKED }) => {
+		if (JS_BLOCKED) {
+			blockJSBtn.textContent = "JS Blocked";
+			blockJSBtn.classList.add("btn-danger");
+			blockJSBtn.classList.remove("btn-primary");
+		} else {
+			blockJSBtn.textContent = "Block JS";
+			blockJSBtn.classList.add("btn-primary");
+			blockJSBtn.classList.remove("btn-danger");
+		}
+	});
+
+	changeUABtn.addEventListener("click", (event) => {
 		spinner.classList.remove("d-none");
 		chrome.storage.sync.get("UA_CHANGED", ({ UA_CHANGED }) => {
-			userAgentChanged = UA_CHANGED;
-			const newValue = !UA_CHANGED;
-			chrome.storage.sync.set({ UA_CHANGED: newValue }, async () => {
+			const uaChanged = !UA_CHANGED;
+			chrome.storage.sync.set({ UA_CHANGED: uaChanged }, async () => {
 				let userAgent = "";
-				if (!newValue) {
-					userAgent = window.navigator.userAgent;
-					actionBtn.textContent = "Spoof User Agent";
-				} else {
+				if (uaChanged) {
 					userAgent = await getRandomUserAgent();
-					actionBtn.textContent = "Unspoof User Agent";
+					changeUABtn.textContent = "User Agent Spoofed";
+				} else {
+					userAgent = window.navigator.userAgent;
+					changeUABtn.textContent = "Spoof User Agent";
 				}
-				switchBtnState(actionBtn);
 				chrome.declarativeNetRequest.updateDynamicRules(
 					{
 						removeRuleIds: [1],
@@ -54,6 +79,57 @@ window.onload = (event) => {
 						],
 					},
 					() => {
+						switchBtnState(changeUABtn);
+						spinner.classList.add("d-none");
+						reload();
+					}
+				);
+			});
+		});
+	});
+
+	blockImageBtn.addEventListener("click", (event) => {
+		spinner.classList.remove("d-none");
+		chrome.storage.sync.get("IMG_BLOCKED", ({ IMG_BLOCKED }) => {
+			const imageBlocked = !IMG_BLOCKED;
+			chrome.storage.sync.set({ IMG_BLOCKED: imageBlocked }, () => {
+				if (imageBlocked) {
+					blockImageBtn.textContent = "Images Blocked";
+				} else {
+					blockImageBtn.textContent = "Block Images";
+				}
+				chrome.contentSettings["images"].set(
+					{
+						primaryPattern: "<all_urls>",
+						setting: imageBlocked ? "block" : "allow",
+					},
+					() => {
+						switchBtnState(blockImageBtn);
+						spinner.classList.add("d-none");
+						reload();
+					}
+				);
+			});
+		});
+	});
+
+	blockJSBtn.addEventListener("click", (event) => {
+		spinner.classList.remove("d-none");
+		chrome.storage.sync.get("JS_BLOCKED", ({ JS_BLOCKED }) => {
+			const jsBlocked = !JS_BLOCKED;
+			chrome.storage.sync.set({ JS_BLOCKED: jsBlocked }, () => {
+				if (jsBlocked) {
+					blockJSBtn.textContent = "JS Blocked";
+				} else {
+					blockJSBtn.textContent = "Block JS";
+				}
+				chrome.contentSettings["javascript"].set(
+					{
+						primaryPattern: "<all_urls>",
+						setting: jsBlocked ? "block" : "allow",
+					},
+					() => {
+						switchBtnState(blockJSBtn);
 						spinner.classList.add("d-none");
 						reload();
 					}

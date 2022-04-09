@@ -1,5 +1,5 @@
 {
-	"name": "Brower Fingerprint Spoofer",
+	"name": "Fingerprint Spoofer",
 	"description": "Helps to spoof browser fingerprinting",
 	"version": "1.0",
 	"manifest_version": 3,
@@ -8,6 +8,7 @@
 	},
 	"permissions": [
 		"storage",
+		"contentSettings",
 		"declarativeNetRequest",
 		"declarativeNetRequestWithHostAccess"
 	],
