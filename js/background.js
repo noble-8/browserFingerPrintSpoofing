@@ -1,5 +1,6 @@
 chrome.storage.sync.set({
-	UA_CHANGED: false,
+	NAV_SPOOFED: false,
+	UA_SPOOFED: false,
 	IMG_BLOCKED: false,
 	JS_BLOCKED: false,
 });

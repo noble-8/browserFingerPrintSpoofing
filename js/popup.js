@@ -1,19 +1,31 @@
 window.onload = (event) => {
-	const changeUABtn = document.querySelector("#changeUA");
+	const spoofNavBtn = document.querySelector("#spoofNav");
+	const spoofUABtn = document.querySelector("#spoofUA");
 	const blockImageBtn = document.querySelector("#blockImg");
 	const blockJSBtn = document.querySelector("#blockJS");
-
 	const spinner = document.querySelector("#spinner");
 
-	chrome.storage.sync.get("UA_CHANGED", ({ UA_CHANGED }) => {
-		if (UA_CHANGED) {
-			changeUABtn.textContent = "User Agent Spoofed";
-			changeUABtn.classList.add("btn-danger");
-			changeUABtn.classList.remove("btn-primary");
+	chrome.storage.sync.get("NAV_SPOOFED", ({ NAV_SPOOFED }) => {
+		if (NAV_SPOOFED) {
+			spoofNavBtn.textContent = "Navigator Spoofed";
+			spoofNavBtn.classList.add("btn-danger");
+			spoofNavBtn.classList.remove("btn-primary");
 		} else {
-			changeUABtn.textContent = "Spoof User Agent";
-			changeUABtn.classList.add("btn-primary");
-			changeUABtn.classList.remove("btn-danger");
+			spoofNavBtn.textContent = "Spoof Navigator";
+			spoofNavBtn.classList.add("btn-primary");
+			spoofNavBtn.classList.remove("btn-danger");
+		}
+	});
+
+	chrome.storage.sync.get("UA_SPOOFED", ({ UA_SPOOFED }) => {
+		if (UA_SPOOFED) {
+			spoofUABtn.textContent = "User Agent Spoofed";
+			spoofUABtn.classList.add("btn-danger");
+			spoofUABtn.classList.remove("btn-primary");
+		} else {
+			spoofUABtn.textContent = "Spoof User Agent";
+			spoofUABtn.classList.add("btn-primary");
+			spoofUABtn.classList.remove("btn-danger");
 		}
 	});
 
@@ -41,18 +53,35 @@ window.onload = (event) => {
 		}
 	});
 
-	changeUABtn.addEventListener("click", (event) => {
+	spoofNavBtn.addEventListener("click", (event) => {
 		spinner.classList.remove("d-none");
-		chrome.storage.sync.get("UA_CHANGED", ({ UA_CHANGED }) => {
-			const uaChanged = !UA_CHANGED;
-			chrome.storage.sync.set({ UA_CHANGED: uaChanged }, async () => {
+		chrome.storage.sync.get("NAV_SPOOFED", ({ NAV_SPOOFED }) => {
+			const navSpoofed = !NAV_SPOOFED;
+			chrome.storage.sync.set({ NAV_SPOOFED: navSpoofed }, () => {
+				if (navSpoofed) {
+					spoofNavBtn.textContent = "Navigator Spoofed";
+				} else {
+					spoofNavBtn.textContent = "Spoof Navigator";
+				}
+				switchBtnState(spoofNavBtn);
+				spinner.classList.add("d-none");
+				spoofNavigator(navSpoofed);
+			});
+		});
+	});
+
+	spoofUABtn.addEventListener("click", (event) => {
+		spinner.classList.remove("d-none");
+		chrome.storage.sync.get("UA_SPOOFED", ({ UA_SPOOFED }) => {
+			const uaSpoofed = !UA_SPOOFED;
+			chrome.storage.sync.set({ UA_SPOOFED: uaSpoofed }, async () => {
 				let userAgent = "";
-				if (uaChanged) {
+				if (uaSpoofed) {
 					userAgent = await getRandomUserAgent();
-					changeUABtn.textContent = "User Agent Spoofed";
+					spoofUABtn.textContent = "User Agent Spoofed";
 				} else {
 					userAgent = window.navigator.userAgent;
-					changeUABtn.textContent = "Spoof User Agent";
+					spoofUABtn.textContent = "Spoof User Agent";
 				}
 				chrome.declarativeNetRequest.updateDynamicRules(
 					{
@@ -79,7 +108,7 @@ window.onload = (event) => {
 						],
 					},
 					() => {
-						switchBtnState(changeUABtn);
+						switchBtnState(spoofUABtn);
 						spinner.classList.add("d-none");
 						reload();
 					}
@@ -138,12 +167,17 @@ window.onload = (event) => {
 		});
 	});
 
-	async function reload() {
+	async function getCurrentTabId() {
 		let [tab] = await chrome.tabs.query({
 			active: true,
 			currentWindow: true,
 		});
-		chrome.tabs.reload(tab.id);
+		return tab.id;
+	}
+
+	async function reload() {
+		const tabId = await getCurrentTabId();
+		chrome.tabs.reload(tabId);
 	}
 
 	async function getRandomUserAgent() {
@@ -157,5 +191,28 @@ window.onload = (event) => {
 	function switchBtnState(btn) {
 		btn.classList.toggle("btn-primary");
 		btn.classList.toggle("btn-danger");
+	}
+
+	async function spoofNavigator(navSpoofed) {
+		const id = "inject_script";
+		if (navSpoofed) {
+			chrome.scripting.registerContentScripts(
+				[
+					{
+						id,
+						matches: ["<all_urls>"],
+						runAt: "document_start",
+						js: ["js/script.js"],
+					},
+				],
+				() => {
+					reload();
+				}
+			);
+		} else {
+			chrome.scripting.unregisterContentScripts({ ids: [id] }, () => {
+				reload();
+			});
+		}
 	}
 };
