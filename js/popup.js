@@ -175,9 +175,11 @@ window.onload = (event) => {
 		return tab.id;
 	}
 
-	async function reload() {
+	async function reload(callback = null) {
 		const tabId = await getCurrentTabId();
 		chrome.tabs.reload(tabId);
+		if (!callback) return;
+		callback();
 	}
 
 	async function getRandomUserAgent() {
@@ -202,7 +204,7 @@ window.onload = (event) => {
 						id,
 						matches: ["<all_urls>"],
 						runAt: "document_start",
-						js: ["js/script.js"],
+						js: ["js/contentScript.js"],
 					},
 				],
 				() => {
@@ -210,9 +212,19 @@ window.onload = (event) => {
 				}
 			);
 		} else {
-			chrome.scripting.unregisterContentScripts({ ids: [id] }, () => {
-				reload();
-			});
+			chrome.declarativeNetRequest.updateDynamicRules(
+				{
+					removeRuleIds: [2],
+				},
+				() => {
+					chrome.scripting.unregisterContentScripts(
+						{ ids: [id] },
+						() => {
+							reload();
+						}
+					);
+				}
+			);
 		}
 	}
 };
