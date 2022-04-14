@@ -177,7 +177,7 @@ window.onload = (event) => {
 
 	async function reload(callback = null) {
 		const tabId = await getCurrentTabId();
-		chrome.tabs.reload(tabId);
+		chrome.tabs.reload(tabId, { bypassCache: true });
 		if (!callback) return;
 		callback();
 	}
