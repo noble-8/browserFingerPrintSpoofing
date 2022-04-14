@@ -1,6 +1,7 @@
 window.onload = (event) => {
 	const spoofNavBtn = document.querySelector("#spoofNav");
 	const spoofUABtn = document.querySelector("#spoofUA");
+	const spoofCanvasBtn = document.querySelector("#spoofCanvas");
 	const blockImageBtn = document.querySelector("#blockImg");
 	const blockJSBtn = document.querySelector("#blockJS");
 	const spinner = document.querySelector("#spinner");
@@ -14,6 +15,18 @@ window.onload = (event) => {
 			spoofNavBtn.textContent = "Spoof Navigator";
 			spoofNavBtn.classList.add("btn-primary");
 			spoofNavBtn.classList.remove("btn-danger");
+		}
+	});
+
+	chrome.storage.sync.get("CANVAS_SPOOFED", ({ CANVAS_SPOOFED }) => {
+		if (CANVAS_SPOOFED) {
+			spoofCanvasBtn.textContent = "Canvas Spoofed";
+			spoofCanvasBtn.classList.add("btn-danger");
+			spoofCanvasBtn.classList.remove("btn-primary");
+		} else {
+			spoofCanvasBtn.textContent = "Spoof Canvas";
+			spoofCanvasBtn.classList.add("btn-primary");
+			spoofCanvasBtn.classList.remove("btn-danger");
 		}
 	});
 
@@ -67,6 +80,26 @@ window.onload = (event) => {
 				spinner.classList.add("d-none");
 				spoofNavigator(navSpoofed);
 			});
+		});
+	});
+
+	spoofCanvasBtn.addEventListener("click", (event) => {
+		spinner.classList.remove("d-none");
+		chrome.storage.sync.get("CANVAS_SPOOFED", ({ CANVAS_SPOOFED }) => {
+			const canvasSpoofed = !CANVAS_SPOOFED;
+			chrome.storage.sync.set(
+				{ CANVAS_SPOOFED: canvasSpoofed },
+				async () => {
+					if (canvasSpoofed) {
+						spoofUABtn.textContent = "Canvas Spoofed";
+					} else {
+						spoofUABtn.textContent = "Spoof Canvas";
+					}
+					switchBtnState(spoofCanvasBtn);
+					spinner.classList.add("d-none");
+					spoofCanvas(canvasSpoofed);
+				}
+			);
 		});
 	});
 
@@ -195,16 +228,17 @@ window.onload = (event) => {
 		btn.classList.toggle("btn-danger");
 	}
 
-	async function spoofNavigator(navSpoofed) {
-		const id = "inject_script";
+	function spoofNavigator(navSpoofed) {
+		const id = "inject_script_navigator";
 		if (navSpoofed) {
 			chrome.scripting.registerContentScripts(
 				[
 					{
 						id,
 						matches: ["<all_urls>"],
+						allFrames: true,
 						runAt: "document_start",
-						js: ["js/contentScript.js"],
+						js: ["js/navigatorContentScript.js"],
 					},
 				],
 				() => {
@@ -212,19 +246,33 @@ window.onload = (event) => {
 				}
 			);
 		} else {
-			chrome.declarativeNetRequest.updateDynamicRules(
-				{
-					removeRuleIds: [2],
-				},
+			chrome.scripting.unregisterContentScripts({ ids: [id] }, () => {
+				reload();
+			});
+		}
+	}
+
+	async function spoofCanvas(canvasSpoofed) {
+		const id = "inject_script_canvas";
+		if (canvasSpoofed) {
+			chrome.scripting.registerContentScripts(
+				[
+					{
+						id,
+						matches: ["<all_urls>"],
+						allFrames: true,
+						runAt: "document_start",
+						js: ["js/canvasContentScript.js"],
+					},
+				],
 				() => {
-					chrome.scripting.unregisterContentScripts(
-						{ ids: [id] },
-						() => {
-							reload();
-						}
-					);
+					reload();
 				}
 			);
+		} else {
+			chrome.scripting.unregisterContentScripts({ ids: [id] }, () => {
+				reload();
+			});
 		}
 	}
 };
