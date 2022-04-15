@@ -1,4 +1,6 @@
 let canvas = document.createElement("canvas");
+var offscreenCanvas = new OffscreenCanvas(256, 256);
+
 canvas.id = "1337h4x0r";
 const canvasWidth = 200;
 const canvasHeight = 200;
@@ -16,6 +18,7 @@ for(let i=0;i<canvasHeight;i++){
 }
 //spoofed value generation
 ctx = canvas.getContext("2d");
+var offCtx = offscreenCanvas.getContext("2d");
 const dataURL = canvas.toDataURL();
 Object.defineProperty(HTMLCanvasElement.prototype, "toDataURL", {
 	get: () => () =>
@@ -24,4 +27,12 @@ Object.defineProperty(HTMLCanvasElement.prototype, "toDataURL", {
 
 Object.defineProperty(HTMLCanvasElement.prototype, "getContext", {
 	get: () => () => ctx,
+});
+
+Object.defineProperty(OffscreenCanvas.prototype, "getContext", {
+	get: () => () => offCtx,
+});
+
+Object.defineProperty(OffscreenCanvas.prototype, "convertToBlob", {
+	get: () => () => offscreen.convertToBlob(),
 });
