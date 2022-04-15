@@ -91,9 +91,9 @@ window.onload = (event) => {
 				{ CANVAS_SPOOFED: canvasSpoofed },
 				async () => {
 					if (canvasSpoofed) {
-						spoofUABtn.textContent = "Canvas Spoofed";
+						spoofCanvasBtn.textContent = "Canvas Spoofed";
 					} else {
-						spoofUABtn.textContent = "Spoof Canvas";
+						spoofCanvasBtn.textContent = "Spoof Canvas";
 					}
 					switchBtnState(spoofCanvasBtn);
 					spinner.classList.add("d-none");
