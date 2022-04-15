@@ -208,11 +208,9 @@ window.onload = (event) => {
 		return tab.id;
 	}
 
-	async function reload(callback = null) {
+	async function reload() {
 		const tabId = await getCurrentTabId();
 		chrome.tabs.reload(tabId, { bypassCache: true });
-		if (!callback) return;
-		callback();
 	}
 
 	async function getRandomUserAgent() {
