@@ -46,6 +46,10 @@ Object.defineProperty(navigator, "mediaDevices", {
 	get: () => undefined,
 });
 
+Object.defineProperty(navigator, "mimeTypes", {
+	get: () => [],
+});
+
 Object.defineProperty(screen, "width", {
 	get: () => 1498,
 });
