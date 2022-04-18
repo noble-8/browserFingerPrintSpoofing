@@ -50,6 +50,10 @@ Object.defineProperty(navigator, "mimeTypes", {
 	get: () => [],
 });
 
+Object.defineProperty(navigator, "hardwareConcurrency", {
+	get: () => 2,
+});
+
 Object.defineProperty(screen, "width", {
 	get: () => 1498,
 });
