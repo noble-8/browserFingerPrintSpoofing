@@ -8,10 +8,8 @@
 	},
 	"permissions": [
 		"storage",
-		"activeTab",
 		"scripting",
 		"contentSettings",
-		"declarativeNetRequest",
 		"declarativeNetRequestWithHostAccess"
 	],
 	"host_permissions": ["<all_urls>"],
