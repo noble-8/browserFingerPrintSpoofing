@@ -1,12 +1,12 @@
 
 # Browser Finger print spoofing
 
-[Browser finger printing](https://en.wikipedia.org/wiki/Device_fingerprint) refers to the practice of collecting information about a user's web browser and using it to create a unique digital profile that can be used to track the user's online activities across different websites. This can include information about the user's device, operating system, browser version, installed plugins, screen resolution, and more.
+[Browser fingerprinting](https://en.wikipedia.org/wiki/Device_fingerprint) refers to the practice of collecting information about a user's web browser and using it to create a unique digital profile that can be used to track the user's online activities across different websites. This can include information about the user's device, operating system, browser version, installed plugins, screen resolution, and more.
+We want to safeguard the user against this profiling. here is a Chrome extension that anonymizes the user.
 
-We want to safegaurd the user against this profiling.
-here is a chrome extension that anonymoizes the user.
+
 - It can spoof the navigator values.
-- It can protect againt Canvas fingerprinting
+- It can protect against Canvas fingerprinting
 - It can spoof the User Agent to a random device
 - Block Images
 - Block Javascript from running on pages
