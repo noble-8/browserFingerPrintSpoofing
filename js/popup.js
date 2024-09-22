@@ -215,7 +215,7 @@ window.onload = (event) => {
 
 	async function getRandomUserAgent() {
 		const response = await fetch(
-			"https://browser-fingerprint-spoof.herokuapp.com/getRandomUserAgent"
+			"https://randua.somespecial.one/"
 		);
 		let userAgent = await response.text();
 		return userAgent;
