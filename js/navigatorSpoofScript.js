@@ -38,10 +38,6 @@ Object.defineProperty(navigator, "connection", {
 	get: () => undefined,
 });
 
-Object.defineProperty(navigator.keyboard, "getLayoutMap", {
-	get: () => () => undefined,
-});
-
 Object.defineProperty(navigator, "mediaDevices", {
 	get: () => undefined,
 });
